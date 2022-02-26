@@ -10,7 +10,10 @@ prompt = 'state > '
 while 1:
     if auto is not None:
         print(' ' * len(prompt) + pinyin)
-        state = input(prompt).replace(' ', '')
+        try:
+            state = input(prompt).replace(' ', '')
+        except EOFError:
+            exit(0)
         assert all(_ in [BAD, GOOD, PART] for _ in state)
 
         stop, pinyin = auto.update(pinyin, state)
@@ -19,7 +22,10 @@ while 1:
         if stop:
             auto = None
     else:
-        x = input('syllables > ')
+        try:
+            x = input('syllables > ')
+        except EOFError:
+            exit(0)
         auto = AutoIdiom()
         pinyin = auto.start([int(_) for _ in x])
         pyperclip.copy(pinyin)
