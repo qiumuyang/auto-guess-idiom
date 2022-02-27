@@ -61,4 +61,4 @@ if __name__ == '__main__':
     if args.weight:
         auto_guess.weights = args.weight
     print('[Weight] ', auto_guess.weights)
-    test(args.ratio)
+    test(args.percent)
