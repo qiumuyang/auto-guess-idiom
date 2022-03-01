@@ -2,7 +2,9 @@ import json
 import string
 from pathlib import Path
 
-import fix_pinyin
+from fix_pinyin import fix
+
+fix()
 
 idiom_path = Path('data/idiom.json')
 syllable_path = Path('data/syllables.json')
@@ -21,7 +23,7 @@ PART = '2'
 
 
 def judge_answer(_correct: str, _answer: str) -> str:
-    assert len(_correct) == len(_answer), _answer
+    assert len(_correct) == len(_answer), 'correct=' + _correct + ' answer=' + _answer
 
     length = len(_correct)
     correct = list(_correct)

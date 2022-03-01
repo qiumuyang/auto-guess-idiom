@@ -10,7 +10,7 @@ from idiom import idioms, GOOD, PART, BAD
 all_pinyin = {word: lazy_pinyin(word) for word in idioms}
 
 log = True
-weights = [1, 1.6]
+weights = [1, 1.595]
 
 
 def get_result_by_scores(word_pinyin: Dict[str, str]) -> Tuple[str, str]:

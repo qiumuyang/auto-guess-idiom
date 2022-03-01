@@ -68,6 +68,3 @@ def fix():
         check[word] = ' '.join(syllables)
 
     load_phrases_dict(dic)
-
-
-fix()
