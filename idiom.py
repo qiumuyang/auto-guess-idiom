@@ -20,6 +20,7 @@ with syllable_path.open(encoding='utf8') as f:
 GOOD = '1'
 BAD = '0'
 PART = '2'
+UNKNOWN = '3'
 
 
 def judge_answer(_correct: str, _answer: str) -> str:

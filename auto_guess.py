@@ -5,7 +5,7 @@ from typing import Dict, Iterable, List, Tuple
 
 from pypinyin import lazy_pinyin
 
-from idiom import idioms, GOOD, PART, BAD
+from idiom import idioms, GOOD, PART, BAD, UNKNOWN
 
 all_pinyin = {word: lazy_pinyin(word) for word in idioms}
 
@@ -68,25 +68,31 @@ class AutoIdiom:
 
     def update(self, guess: str, state: str) -> Tuple[bool, str]:
         # check state foreach letter
-        char = {s: 3 for s in string.ascii_lowercase}
-        contain = {s: 0 for s in string.ascii_lowercase}
-        priority = [0, 2, 1, -1]
+        char_state = {s: UNKNOWN for s in string.ascii_lowercase}
+        lower_bound = {s: 0 for s in string.ascii_lowercase}
+        upper_bound = {s: float('inf') for s in string.ascii_lowercase}
+        priority = {
+            BAD: 0,
+            GOOD: 2,
+            PART: 1,
+            UNKNOWN: -1,
+        }
         for c, s in zip(guess, state):
-            s = int(s)
-            if priority[s] > priority[char[c]]:
-                char[c] = s
-            if s == 2:
-                contain[c] += 1
+            if priority[s] > priority[char_state[c]]:
+                char_state[c] = s
+            if s == GOOD or s == PART:
+                lower_bound[c] += 1
+        for c, s in zip(guess, state):
+            if s == BAD:
+                upper_bound[c] = lower_bound[c]
 
-        bad = ''.join([_ for _, s in char.items() if s == 0])
+        bad = ''.join([_ for _, s in char_state.items() if s == BAD])
         regex_parts = []
         for c, s in zip(guess, state):
             if s == GOOD:
                 regex_parts.append(c)
-            elif s == PART:
+            elif s == PART or s == BAD:
                 regex_parts.append('[^%s]' % (c + bad))
-            elif s == BAD and bad:  # in case bad is empty string
-                regex_parts.append('[^%s]' % bad)
             else:
                 regex_parts.append('.')
         regex = ''.join(regex_parts)
@@ -100,8 +106,8 @@ class AutoIdiom:
                 pop_keys.append(word)
             else:  # remove letter-count not satisfied
                 counter = Counter(pinyin)
-                for c, num in contain.items():
-                    if counter.get(c, 0) < num:
+                for c in lower_bound:
+                    if not (lower_bound[c] <= counter.get(c, 0) <= upper_bound[c]):
                         pop_keys.append(word)
                         break
 
